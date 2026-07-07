@@ -227,7 +227,7 @@ a:focus-visible, button:focus-visible {
 
 .hero-reveal-logo {
   position: absolute;
-  top: 9%;
+  bottom: 9%;
   left: 50%;
   transform: translateX(-50%);
   width: 40%;
