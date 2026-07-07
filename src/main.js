@@ -46,6 +46,22 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 })
 revealEls.forEach((el) => observer.observe(el))
 
+/* ===== MENTIONS LÉGALES ===== */
+const legalToggle = document.getElementById('legalToggle')
+const legalContent = document.getElementById('legalContent')
+if (legalToggle && legalContent) {
+  legalToggle.addEventListener('click', () => {
+    const isHidden = legalContent.hasAttribute('hidden')
+    if (isHidden) {
+      legalContent.removeAttribute('hidden')
+      legalToggle.setAttribute('aria-expanded', 'true')
+    } else {
+      legalContent.setAttribute('hidden', '')
+      legalToggle.setAttribute('aria-expanded', 'false')
+    }
+  })
+}
+
 /* ===== BURGER MENU ===== */
 const burger = document.getElementById('navBurger')
 const navLinks = document.getElementById('navLinks')

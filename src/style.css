@@ -940,16 +940,20 @@ a:focus-visible, button:focus-visible {
   text-align: left;
 }
 
-.legal-block summary {
+.legal-toggle {
+  display: block;
+  margin: 0 auto;
   cursor: pointer;
   text-align: center;
   font-size: 0.8rem;
   color: rgba(192,192,192,0.5);
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 4px;
   transition: color 0.25s var(--ease);
-  list-style: none;
 }
-.legal-block summary::-webkit-details-marker { display: none; }
-.legal-block summary:hover { color: var(--silver-dim); }
+.legal-toggle:hover { color: var(--silver-dim); }
 
 .legal-content {
   margin-top: 20px;
