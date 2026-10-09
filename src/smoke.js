@@ -142,7 +142,7 @@ export function initSmoke(canvas) {
   resize()
   window.addEventListener('resize', resize)
 
-  let rafId
+  let rafId = null
   const start = performance.now()
   function frame(now) {
     const t = (now - start) / 1000
@@ -154,8 +154,22 @@ export function initSmoke(canvas) {
   }
   rafId = requestAnimationFrame(frame)
 
-  return function stop() {
-    cancelAnimationFrame(rafId)
-    window.removeEventListener('resize', resize)
+  /* Pause quand la fumée n'est pas visible (recouverte par le fond rouge
+     ou hero sorti de l'écran) : libère le GPU pour le reste de la page. */
+  function setPaused(paused) {
+    if (paused && rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    } else if (!paused && rafId === null) {
+      rafId = requestAnimationFrame(frame)
+    }
+  }
+
+  return {
+    setPaused,
+    stop() {
+      setPaused(true)
+      window.removeEventListener('resize', resize)
+    },
   }
 }

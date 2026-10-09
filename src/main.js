@@ -7,9 +7,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 /* ===== FUMÉE (WebGL) ===== */
 const smokeCanvas = document.getElementById('smoke-canvas')
-if (smokeCanvas && !prefersReducedMotion) {
-  initSmoke(smokeCanvas)
-}
+const smoke = smokeCanvas && !prefersReducedMotion ? initSmoke(smokeCanvas) : null
 
 /* ===== ENSEIGNE NÉON ===== */
 const neonWrap = document.querySelector('.neon-wrap')
@@ -80,25 +78,50 @@ const heroPinWrap = document.querySelector('.hero-pin-wrap')
 const heroRevealBg = document.querySelector('.hero-reveal-bg')
 const heroTitle = document.getElementById('heroTitle')
 const heroFadeOutEls = document.querySelectorAll('.hero-fade-out')
+const heroRevealLogo = document.querySelector('.hero-reveal-logo')
 
 if (heroPinWrap && heroRevealBg) {
   if (prefersReducedMotion) {
     heroRevealBg.style.opacity = '0'
   } else {
+    // Mesures mises en cache (relues seulement au resize) : lire la mise en
+    // page à chaque scroll juste après avoir écrit des styles force un reflow.
+    let pinTop = 0
+    let scrollableDistance = 0
+    let vw = 0
+    let vh = 0
+    function measure() {
+      vw = window.innerWidth
+      vh = window.innerHeight
+      pinTop = heroPinWrap.getBoundingClientRect().top + window.scrollY
+      scrollableDistance = heroPinWrap.offsetHeight - vh
+    }
+
     function updateHeroReveal() {
-      const rect = heroPinWrap.getBoundingClientRect()
-      const scrollableDistance = heroPinWrap.offsetHeight - window.innerHeight
-      let progress = scrollableDistance > 0 ? -rect.top / scrollableDistance : 0
+      let progress = scrollableDistance > 0 ? (window.scrollY - pinTop) / scrollableDistance : 0
       progress = Math.min(Math.max(progress, 0), 1)
 
-      const w = 10 + (window.innerWidth - 10) * progress
-      const h = 10 + (window.innerHeight - 10) * progress
+      // Même géométrie qu'avant (10px → plein écran, coins 40px → 0),
+      // mais via clip-path : pas de reflow ni de repaint du contenu.
+      const w = 10 + (vw - 10) * progress
+      const h = 10 + (vh - 10) * progress
       const r = 40 * (1 - progress)
+      const insetX = (vw - w) / 2
+      const insetY = (vh - h) / 2
 
-      heroRevealBg.style.width = `${w}px`
-      heroRevealBg.style.height = `${h}px`
-      heroRevealBg.style.borderRadius = `${r}px`
+      heroRevealBg.style.clipPath = `inset(${insetY}px ${insetX}px round ${r}px)`
       heroRevealBg.style.opacity = String(Math.min(progress / 0.08, 1))
+
+      // Le logo était dimensionné/placé par rapport à la carte qui grossit :
+      // on reproduit ce mouvement avec un transform (composité par le GPU).
+      if (heroRevealLogo) {
+        const scale = Math.min(0.4 * w, 240) / Math.min(0.4 * vw, 240)
+        const dy = 0.41 * (h - vh)
+        heroRevealLogo.style.transform = `translate(-50%, ${dy}px) scale(${scale})`
+      }
+
+      // Fumée invisible une fois le rouge plein écran ou le hero dépassé.
+      smoke?.setPaused(progress >= 1)
 
       heroTitle.classList.toggle('is-on-red', progress > 0.1)
 
@@ -107,7 +130,8 @@ if (heroPinWrap && heroRevealBg) {
     }
 
     lenis.on('scroll', updateHeroReveal)
-    window.addEventListener('resize', updateHeroReveal)
+    window.addEventListener('resize', () => { measure(); updateHeroReveal() })
+    measure()
     updateHeroReveal()
   }
 }
