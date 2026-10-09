@@ -90,9 +90,14 @@ if (heroPinWrap && heroRevealBg) {
     let scrollableDistance = 0
     let vw = 0
     let vh = 0
+    // On mesure le hero lui-même (100vh) et pas window.innerHeight : sur
+    // mobile, innerHeight varie avec la barre d'adresse alors que 100vh
+    // reste fixe → le rouge ne couvrait pas tout l'écran et le progrès
+    // était décalé par rapport à la durée réelle de l'épinglage.
+    const heroSection = heroRevealBg.parentElement
     function measure() {
-      vw = window.innerWidth
-      vh = window.innerHeight
+      vw = heroSection.clientWidth
+      vh = heroSection.clientHeight
       pinTop = heroPinWrap.getBoundingClientRect().top + window.scrollY
       scrollableDistance = heroPinWrap.offsetHeight - vh
     }
