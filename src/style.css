@@ -167,86 +167,13 @@ a:focus-visible, button:focus-visible {
   letter-spacing: 0.5px;
 }
 
-/* ----- Transition "fond rouge qui grossit" -----
-   La page d'accueil reste identique à l'ouverture (rien ne bouge). C'est
-   seulement au premier scroll qu'un fond rouge apparaît, centré derrière
-   le titre, puis grossit progressivement jusqu'à recouvrir tout l'écran.
-   Le titre "B.HAIR.BZ" ne grossit jamais : il garde sa taille normale et
-   passe juste au blanc une fois sur le rouge, pendant que le reste du
-   texte s'efface (voir main.js). Le hero reste épinglé (sticky) pendant
-   toute la transition. */
-.hero-pin-wrap {
-  position: relative;
-  height: 220vh;
-}
-
 /* ===== HERO ===== */
 .hero-section {
   overflow: hidden;
   background: var(--black);
-  position: sticky;
-  top: 0;
+  position: relative;
   height: 100vh;
   z-index: 1;
-}
-
-.hero-reveal-bg {
-  /* Toujours plein écran : c'est le clip-path (piloté en JS) qui le fait
-     grossir. Animer width/height forçait un reflow + un repaint complet
-     (dégradé + bruit SVG) à chaque frame → à-coups. */
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  opacity: 0;
-  overflow: hidden;
-  clip-path: inset(50% 50% round 40px);
-  background: linear-gradient(155deg, #ff3b3b 0%, var(--red) 45%, #6e0f0f 100%);
-  will-change: clip-path, opacity;
-}
-
-/* Halo doux qui casse l'aplat de couleur, et grain cinématique discret
-   par-dessus pour donner de la texture plutôt qu'un rouge plat. */
-.hero-reveal-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 75% 55% at 50% 18%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 60%);
-  pointer-events: none;
-}
-.hero-reveal-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  pointer-events: none;
-}
-
-.hero-reveal-logo {
-  position: absolute;
-  bottom: 9%;
-  left: 50%;
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  width: 40%;
-  max-width: 240px;
-  opacity: 0.92;
-  will-change: transform;
-  filter: drop-shadow(0 10px 26px rgba(0,0,0,0.35));
-  pointer-events: none;
-}
-
-#hero h1.is-on-red {
-  background: none;
-  -webkit-text-fill-color: #fff;
-  color: #fff;
-  text-shadow: none;
-}
-
-.hero-fade-out {
-  will-change: opacity;
 }
 
 /* ----- Fumée animée -----
